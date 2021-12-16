@@ -90,7 +90,7 @@ namespace OCR_Cheque.Controllers
                     Console.WriteLine(path + fileName);
                     var nombre_imagen = path + "\\" + fileName;
                     Console.WriteLine("IMAGEN:"+ nombre_imagen);
-                    //OCR_Image(nombre_imagen);
+                    OCR_Image(nombre_imagen);
 
                     // TESSERACT OCR
                     //   OCR.Class1 hola = new OCR.Class1();
@@ -99,8 +99,8 @@ namespace OCR_Cheque.Controllers
                     
 
                     // IRON OCR
-                    OCR_IRON.IRON_OCR nuevo = new OCR_IRON.IRON_OCR();
-                    Console.WriteLine(nuevo.LeerImagen(nombre_imagen));
+                    //OCR_IRON.IRON_OCR nuevo = new OCR_IRON.IRON_OCR();
+                    //Console.WriteLine(nuevo.LeerImagen(nombre_imagen));
                 }
             }
 

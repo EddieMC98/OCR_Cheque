@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>fb57dd34-d91e-4711-910e-54c96c3d3156</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IronOcr" Version="2021.11.0" />
+    <PackageReference Include="IronOcr.Languages.Spanish" Version="2020.11.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
+    <PackageReference Include="Tesseract" Version="4.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="tessdata\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="OCR">
+      <HintPath>..\..\OCR_Tesseract\OCR\bin\Debug\netcoreapp3.1\OCR.dll</HintPath>
+    </Reference>
+    <Reference Include="OCR_IRON">
+      <HintPath>..\..\IRON_OCR\OCR_IRON\bin\Debug\netcoreapp3.1\OCR_IRON.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

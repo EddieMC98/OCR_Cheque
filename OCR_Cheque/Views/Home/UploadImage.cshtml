@@ -1,0 +1,43 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Home";
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>HOME</title>
+</head>
+<body>
+    <form method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="UploadImage">
+        <span>Seleccionar imagen:</span>
+        <br />
+        <br />
+        <input type="file" name="postedFiles" multiple accept="image/*" />
+        <br />
+        <br />
+        <input type="submit" value="Subir" />
+        <br />
+        <br />
+        <span style="color:green">@Html.Raw(ViewBag.Message)</span>
+    </form>
+
+    @if (ViewBag.Result == true)
+    {
+        <fieldset>
+            <legend>Resultados Obtenidos:</legend>
+            <div class="form-group">
+                <label>Tasa de precisión</label>
+                <label>@ViewBag.mean</label>
+            </div>
+            <div class="form-group">
+                <label>Texto Convertido</label>
+                <textarea class="form-control" readonly rows="10">@ViewBag.res</textarea>
+            </div>
+        </fieldset>
+    }
+</body>
+</html>

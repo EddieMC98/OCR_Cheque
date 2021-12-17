@@ -91,6 +91,7 @@ namespace OCR_Cheque.Controllers
                     var nombre_imagen = path + "\\" + fileName;
                     Console.WriteLine("IMAGEN:"+ nombre_imagen);
                     OCR_Image(nombre_imagen);
+                    OCR_Texto_Codigo(nombre_imagen);
 
                     // TESSERACT OCR
                     //   OCR.Class1 hola = new OCR.Class1();
@@ -169,7 +170,6 @@ namespace OCR_Cheque.Controllers
                     datos_cuenta["GT"] = aux.Trim();
                 }
             }
-            datos_cuenta["Código Barras"] = palabras[palabras.Length - 2].Substring(2);
             foreach (KeyValuePair<string, string> kvp in datos_cuenta)
             {
                 texto_requerido += kvp.Key + ":" + kvp.Value + "\n";
@@ -177,6 +177,34 @@ namespace OCR_Cheque.Controllers
             ViewBag.res = texto_requerido;
         }
 
-
+        public void OCR_Texto_Codigo(string NombreImagen)
+        {
+            try
+            {
+                using (var engine = new TesseractEngine(@"tessdata", "e13b", EngineMode.Default))
+                {
+                    using (var img = Pix.LoadFromFile(NombreImagen))
+                    {
+                        using (var page = engine.Process(img))
+                        {
+                            var text = page.GetText();
+                            //Console.WriteLine("Tasa de precisión: " + page.GetMeanConfidence());
+                            Console.WriteLine("Texto MCR: " + text);
+                            var palabras = text.Split("\n");
+                            var texto_requerido = String.Empty;
+                            datos_cuenta["Código Barras"] = palabras[palabras.Length - 2].Replace("A", "").Replace("B", "").Replace("C", "");
+                            foreach (KeyValuePair<string, string> kvp in datos_cuenta)
+                            {
+                                texto_requerido += kvp.Key + ":" + kvp.Value + "\n";
+                            }
+                            ViewBag.res = texto_requerido;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
     }
 }

@@ -89,7 +89,7 @@ namespace OCR_Cheque.Controllers
                     Console.WriteLine("TEXTOOOOOOOO");
                     Console.WriteLine(path + fileName);
                     var nombre_imagen = path + "\\" + fileName;
-                    Console.WriteLine("IMAGEN:"+ nombre_imagen);
+                    Console.WriteLine("IMAGEN:" + nombre_imagen);
                     OCR_Image(nombre_imagen);
                     OCR_Texto_Codigo(nombre_imagen);
 
@@ -97,11 +97,11 @@ namespace OCR_Cheque.Controllers
                     //   OCR.Class1 hola = new OCR.Class1();
                     //var name = hola.ObtenerTexto(nombre_imagen, Directory.GetCurrentDirectory()+"\\tessdata\\");
                     //Console.WriteLine(name);
-                    
+
 
                     // IRON OCR
-                  //  OCR_IRON.IRON_OCR nuevo = new OCR_IRON.IRON_OCR();
-                   // Console.WriteLine(nuevo.LeerImagen(nombre_imagen));
+                    //  OCR_IRON.IRON_OCR nuevo = new OCR_IRON.IRON_OCR();
+                    //Console.WriteLine(nuevo.LeerImagen(nombre_imagen));
                 }
             }
 
@@ -121,8 +121,16 @@ namespace OCR_Cheque.Controllers
                         {
                             var text = page.GetText();
                             //Console.WriteLine("Tasa de precisión: " + page.GetMeanConfidence());
-                            // Console.WriteLine("Texto: " + text);
-                            Cuenta_Cheque(text);
+                            Console.WriteLine("Texto: " + text);
+                            if (text.Contains("Banco INV"))
+                            {
+                                Cuenta_Cheque(text);
+                            }
+                            else
+                            {
+                                Cheque_Bi(text);
+                            }
+
                             //ViewBag.res = text;
                             ViewBag.mean = String.Format("{0:p}", page.GetMeanConfidence());
                         }
@@ -189,7 +197,7 @@ namespace OCR_Cheque.Controllers
                         {
                             var text = page.GetText();
                             //Console.WriteLine("Tasa de precisión: " + page.GetMeanConfidence());
-                            Console.WriteLine("Texto MCR: " + text);
+                            //Console.WriteLine("Texto MCR: " + text);
                             var palabras = text.Split("\n");
                             var texto_requerido = String.Empty;
                             datos_cuenta["Código Barras"] = palabras[palabras.Length - 2].Replace("A", "").Replace("B", "").Replace("C", "");
@@ -205,6 +213,85 @@ namespace OCR_Cheque.Controllers
             catch (Exception)
             {
             }
+        }
+
+        public void Cheque_Bi(String texto)
+        {
+            datos_cuenta.Add("Nombre_Cuenta", "");
+            datos_cuenta.Add("Numero_Cuenta", "");
+            datos_cuenta.Add("Cheque_Cuenta", "");
+            datos_cuenta.Add("GT", "");
+            datos_cuenta.Add("Código Barras", "");
+            var palabras = texto.Split("\n");
+            if (texto.Contains("QUETZAL"))
+            {
+                datos_cuenta.Add("Moneda", "Quetzales");
+            }
+            else if (texto.Contains("DOLAR"))
+            {
+                datos_cuenta.Add("Moneda", "Dolar");
+            }
+            var texto_requerido = "";
+            var contador = 0;
+            foreach (var item in palabras)
+            {
+                contador++;
+                if (item.StartsWith("Guatemala"))
+                {
+                    if (datos_cuenta["Moneda"] == "Quetzales")
+                    {
+                        int found = item.IndexOf("Guatemala");
+                        var aux = item.Substring(found + 19);
+                        datos_cuenta["Nombre_Cuenta"] = aux.Trim();
+                    }
+                    else
+                    {
+                        datos_cuenta["Nombre_Cuenta"] = palabras[contador + 5].Split("-")[0].Trim();
+                    }
+
+                }
+                if (item.Contains("CUENTA"))
+                {
+                    int found = item.IndexOf("CUENTA");
+                    var aux = item.Substring(found + 7, 12);
+                    datos_cuenta["Numero_Cuenta"] = aux.Trim();
+                }
+                if (item.Contains("CHEQUE") || item.Contains("cueque"))
+                {
+                    if (item.Contains("cueque"))
+                    {
+                        int found = item.IndexOf("cueque");
+                        var aux = item.Substring(found + 12, 8);
+                        datos_cuenta["Cheque_Cuenta"] = aux.Trim();
+                    }
+                    else
+                    {
+                        int found = item.IndexOf("CHEQUE");
+                        var aux = item.Substring(found + 11, 8);
+                        datos_cuenta["Cheque_Cuenta"] = aux.Trim();
+                    }
+
+                }
+                if (item.StartsWith("GT"))
+                {
+                    int found = item.IndexOf("GT");
+                    var aux = item.Substring(found);
+                    datos_cuenta["GT"] = aux.Trim();
+                }
+            }
+            if (datos_cuenta["Moneda"] == "Quetzales")
+            {
+                var aux_cuenta = datos_cuenta["Cheque_Cuenta"];
+                var int_cuenta = aux_cuenta.Replace("0", "").Length;
+                var aux_no_cuenta = datos_cuenta["Nombre_Cuenta"].Split(" ");
+                var bar = aux_no_cuenta.Take(aux_no_cuenta.Length- int_cuenta);
+                datos_cuenta["Nombre_Cuenta"] = String.Join(" ", bar);
+            }
+            foreach (KeyValuePair<string, string> kvp in datos_cuenta)
+            {
+                texto_requerido += kvp.Key + ":" + kvp.Value + "\n";
+            }
+            ViewBag.res = texto_requerido;
         }
     }
 }
